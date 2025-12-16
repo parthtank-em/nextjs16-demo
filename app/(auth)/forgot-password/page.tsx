@@ -5,13 +5,10 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { loginUser } from "@/actions/auth";
-import { useRouter } from "next/navigation";
+import { forgotPassword } from "@/actions/auth";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { PasswordInput } from "@/components/common/password-input";
-import { loginSchema, type LoginInput } from "@/lib/validations/auth.schema";
 import {
   Form,
   FormControl,
@@ -20,29 +17,33 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  ForgotPasswordInput,
+  forgotPasswordSchema,
+} from "@/lib/validations/auth.schema";
 
-export default function LoginPage() {
-  const router = useRouter();
+export default function ForgotPasswordPage() {
+  const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
-  const form = useForm<LoginInput>({
-    resolver: zodResolver(loginSchema),
+  const form = useForm<ForgotPasswordInput>({
+    resolver: zodResolver(forgotPasswordSchema),
     defaultValues: {
       email: "",
-      password: "",
     },
   });
 
-  const onSubmit = async (data: LoginInput) => {
+  const onSubmit = async (data: ForgotPasswordInput) => {
     setErrorMessage("");
+    setSuccessMessage("");
 
-    const result = await loginUser(data);
+    const result = await forgotPassword(data);
 
     if (result.success) {
-      router.push("/dashboard");
-      router.refresh();
+      setSuccessMessage(result.message || "Password reset link sent!");
+      form.reset();
     } else {
-      setErrorMessage(result.error || "Login failed");
+      setErrorMessage(result.error || "Failed to send reset link");
     }
   };
 
@@ -51,12 +52,24 @@ export default function LoginPage() {
       <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="text-center text-3xl font-bold text-gray-900">
-            Sign in to your account
+            Forgot your password?
           </h2>
+          <p className="mt-2 text-center text-sm text-gray-600">
+            Enter your email address and we&apos;ll send you a link to reset
+            your password.
+          </p>
         </div>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            {successMessage && (
+              <Alert className="bg-green-50 border-green-200">
+                <AlertDescription className="text-green-800">
+                  {successMessage}
+                </AlertDescription>
+              </Alert>
+            )}
+
             {errorMessage && (
               <Alert variant="destructive">
                 <AlertDescription>{errorMessage}</AlertDescription>
@@ -82,40 +95,24 @@ export default function LoginPage() {
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <div className="flex items-center justify-between">
-                    <FormLabel>Password</FormLabel>
-                    <Link
-                      href="/forgot-password"
-                      className="text-sm text-blue-600 hover:text-blue-500 hover:underline"
-                    >
-                      Forgot password?
-                    </Link>
-                  </div>
-                  <FormControl>
-                    <PasswordInput {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
             <Button
               type="submit"
               className="w-full"
               disabled={form.formState.isSubmitting}
             >
-              {form.formState.isSubmitting ? "Signing in..." : "Sign in"}
+              {form.formState.isSubmitting ? "Sending..." : "Send reset link"}
             </Button>
 
-            <div className="text-center">
+            <div className="text-center space-y-2">
+              <Link
+                href="/login"
+                className="text-sm text-blue-600 hover:text-blue-500 hover:underline block"
+              >
+                Back to login
+              </Link>
               <Link
                 href="/register"
-                className="text-sm text-blue-600 hover:text-blue-500 hover:underline"
+                className="text-sm text-gray-600 hover:text-gray-500 hover:underline block"
               >
                 Don&apos;t have an account? Register
               </Link>

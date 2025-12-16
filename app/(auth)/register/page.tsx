@@ -26,7 +26,6 @@ import {
 
 export default function RegisterPage() {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   const form = useForm<RegisterInput>({
@@ -41,7 +40,6 @@ export default function RegisterPage() {
   });
 
   const onSubmit = async (data: RegisterInput) => {
-    setIsLoading(true);
     setErrorMessage("");
 
     const result = await registerUser(data);
@@ -52,8 +50,6 @@ export default function RegisterPage() {
     } else {
       setErrorMessage(result.error || "Registration failed");
     }
-
-    setIsLoading(false);
   };
 
   return (
@@ -160,8 +156,12 @@ export default function RegisterPage() {
               )}
             />
 
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Creating account..." : "Register"}
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={form.formState.isSubmitting}
+            >
+              {form.formState.isSubmitting ? "Creating account..." : "Register"}
             </Button>
 
             <div className="text-center">

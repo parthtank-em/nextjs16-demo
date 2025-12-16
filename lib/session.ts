@@ -9,10 +9,11 @@ const SESSION_COOKIE_NAME = "session";
 const SESSION_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 days
 
 export interface SessionUser {
-  id: number;
+  id: string;
   email: string;
   firstName: string;
   lastName: string;
+  role: "ADMIN" | "USER";
 }
 
 export async function createSession(user: SessionUser) {

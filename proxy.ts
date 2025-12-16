@@ -10,7 +10,12 @@ const JWT_SECRET = new TextEncoder().encode(
 const protectedRoutes = ["/dashboard"];
 
 // Routes that should redirect to dashboard if already logged in
-const authRoutes = ["/login", "/register"];
+const authRoutes = [
+  "/login",
+  "/register",
+  "/forgot-password",
+  "/reset-password",
+];
 
 export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
