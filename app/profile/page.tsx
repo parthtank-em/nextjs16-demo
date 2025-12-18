@@ -12,7 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-export default async function DashboardPage() {
+export default async function ProfilePage() {
   const session = await getSession();
 
   // Redirect to login if no session

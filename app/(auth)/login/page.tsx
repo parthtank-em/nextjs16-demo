@@ -39,7 +39,13 @@ export default function LoginPage() {
     const result = await loginUser(data);
 
     if (result.success) {
-      router.push("/dashboard");
+      const role = result.user?.role;
+
+      if (role === "USER") {
+        router.push("/user");
+      } else if (role === "ADMIN") {
+        router.push("/admin");
+      }
       router.refresh();
     } else {
       setErrorMessage(result.error || "Login failed");

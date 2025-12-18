@@ -10,6 +10,7 @@ if (!apiKey) {
 
 export const SENDGRID_TEMPLATES = {
   PASSWORD_RESET: process.env.SENDGRID_TEMPLATE_PASSWORD_RESET || "",
+  INVITATION: process.env.SENDGRID_TEMPLATE_INVITATION || "",
 } as const;
 
 export function sendEmailAsync<T extends (...args: any[]) => Promise<any>>(
@@ -84,3 +85,34 @@ export async function sendPasswordResetEmail(
 export const sendPasswordResetEmailAsync = sendEmailAsync(
   sendPasswordResetEmail
 );
+
+export async function sendInvitationEmail(
+  email: string,
+  invitationToken: string,
+  invitation: {
+    first_name: string;
+    last_name: string;
+    role: string;
+  },
+  inviterName: string
+) {
+  const invitationLink = `${
+    process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+  }/accept-invitation?token=${invitationToken}`;
+
+  return sendEmail({
+    to: email,
+    subject: "You're Invited to Join Our Platform",
+    templateId: SENDGRID_TEMPLATES.INVITATION,
+    dynamicTemplateData: {
+      first_name: invitation.first_name,
+      last_name: invitation.last_name,
+      invitation_link: invitationLink,
+      inviter_name: inviterName,
+      role: invitation.role,
+      expiry_days: "7",
+    },
+  });
+}
+
+export const sendInvitationEmailAsync = sendEmailAsync(sendInvitationEmail);
